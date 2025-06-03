@@ -1,1 +1,56 @@
-dd
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sample Pi Network App</title>
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+  <script>
+    // Initialize Pi SDK with sandbox mode true for testing on testnet
+    Pi.init({ version: "2.0", sandbox: true });
+
+    async function authenticate() {
+      try {
+        // Request permissions: payments and username
+        const scopes = ["payments", "username"];
+        const auth = await Pi.authenticate(scopes);
+        document.getElementById("status").innerText = 
+          `Authenticated as: ${auth.username}`;
+        window.accessToken = auth.accessToken; // Save token for further requests
+      } catch (error) {
+        document.getElementById("status").innerText = "Authentication failed.";
+        console.error(error);
+      }
+    }
+
+    async function makePayment() {
+      if (!window.accessToken) {
+        alert("Please authenticate first.");
+        return;
+      }
+
+      try {
+        const paymentDetails = {
+          app: "Sample Pi Network App",
+          recipient: "somepiusername", // Replace with recipient's Pi username
+          amount: 1,                   // Amount in Pi
+          memo: "Test payment from Pi app",
+        };
+
+        const payment = await Pi.createPayment(paymentDetails);
+        alert("Payment created: " + payment.transactionId);
+      } catch (error) {
+        alert("Payment failed.");
+        console.error(error);
+      }
+    }
+  </script>
+</head>
+<body>
+  <h1>Welcome to Sample Pi Network App</h1>
+  <button onclick="authenticate()">Authenticate with Pi</button>
+  <p id="status">Not authenticated</p>
+
+  <button onclick="makePayment()">Make a Test Payment (1 Pi)</button>
+</body>
+</html>
